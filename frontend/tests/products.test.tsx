@@ -116,7 +116,7 @@ describe('Products Feature Slice & User Flows', () => {
     )
 
     // Modal title & product in list
-    expect(screen.getByText(/Create Order|Crear Orden/i)).toBeInTheDocument()
+    expect(screen.getByText(/Shopping Order|Orden de Compra/i)).toBeInTheDocument()
     expect(screen.getByText('Dell Inspiron 5050')).toBeInTheDocument()
 
     // 3 Payment type options: Pago en Efectivo, Pago en TDC, Transferencia
@@ -128,12 +128,13 @@ describe('Products Feature Slice & User Flows', () => {
     expect(screen.getAllByText(/\$4,700\.00/).length).toBeGreaterThan(0)
   })
 
-  it('renders SettingsModal with Role and Language toggles', () => {
-    renderWithSettings(<SettingsModal isOpen={true} onClose={vi.fn()} />)
+  it('renders SettingsModal with Role and Language toggles and Order History button', () => {
+    renderWithSettings(<SettingsModal isOpen={true} onClose={vi.fn()} onOpenOrderHistory={vi.fn()} />)
 
     expect(screen.getByRole('button', { name: /Admin|Administrador/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /User|Usuario/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /English|Inglés/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Spanish|Español/i })).toBeInTheDocument()
+    expect(screen.getByText(/Historial de Órdenes|Orders History/i)).toBeInTheDocument()
   })
 })

@@ -7,6 +7,7 @@ public interface IPagaFacilClient
 {
     Task<ProviderHealthResult> CheckHealthAsync(CancellationToken ct = default);
     Task<PaymentResult> CreateOrderAsync(ThirdPartyOrderCreateRequest request, CancellationToken ct = default);
+    Task<bool> CancelOrderAsync(string orderId, CancellationToken ct = default);
 }
 
 public class PagaFacilClient(HttpClient httpClient, ILogger<PagaFacilClient> logger) : IPagaFacilClient
@@ -74,7 +75,7 @@ public class PagaFacilClient(HttpClient httpClient, ILogger<PagaFacilClient> log
             ?? throw new InvalidOperationException($"Empty or invalid response received from {ProviderName}");
 
         var mappedFees = (thirdPartyOrder.Fees ?? [])
-            .Select(f => new PaymentFeeDto(f.Name ?? "Fee", (decimal)f.Amount))
+            .Select(f => new PaymentFeeDto(f.DisplayName, (decimal)f.Amount))
             .ToList();
 
         return new PaymentResult(
@@ -87,4 +88,26 @@ public class PagaFacilClient(HttpClient httpClient, ILogger<PagaFacilClient> log
             CreatedAt: thirdPartyOrder.CreatedDate
         );
     }
+
+    public async Task<bool> CancelOrderAsync(string orderId, CancellationToken ct = default)
+    {
+        logger.LogInformation("Requesting order cancellation to {Provider} for external order {OrderId}", ProviderName, orderId);
+        try
+        {
+            var response = await httpClient.PutAsync($"/cancel?id={Uri.EscapeDataString(orderId)}", null, ct);
+            if (!response.IsSuccessStatusCode)
+            {
+                var body = await response.Content.ReadAsStringAsync(ct);
+                logger.LogWarning("Failed to cancel order on {Provider}: HTTP {StatusCode} {Body}", ProviderName, response.StatusCode, body);
+                return false;
+            }
+            return true;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Exception while cancelling order on {Provider}", ProviderName);
+            return false;
+        }
+    }
 }
+

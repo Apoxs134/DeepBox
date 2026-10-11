@@ -9,6 +9,21 @@ public static class DbInitializer
     {
         await context.Database.EnsureCreatedAsync();
 
+        await context.Database.ExecuteSqlRawAsync(@"
+            CREATE TABLE IF NOT EXISTS ""Orders"" (
+                ""Id"" INTEGER NOT NULL CONSTRAINT ""PK_Orders"" PRIMARY KEY AUTOINCREMENT,
+                ""ExternalOrderId"" TEXT NOT NULL,
+                ""ProviderId"" TEXT NOT NULL,
+                ""PaymentMode"" TEXT NOT NULL,
+                ""Amount"" TEXT NOT NULL,
+                ""Status"" TEXT NOT NULL,
+                ""FeesJson"" TEXT NOT NULL,
+                ""ProductsJson"" TEXT NOT NULL,
+                ""CreatedAt"" TEXT NOT NULL,
+                ""UpdatedAt"" TEXT NULL
+            );
+        ");
+
         if (!await context.Products.AnyAsync())
         {
             context.Products.AddRange(

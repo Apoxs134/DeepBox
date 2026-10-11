@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { CartItem, PaymentMethod, OrderConfirmationResult } from '../types'
 import { useSettings } from '../../settings'
+import { useToast } from '../../toast'
 
 interface CartModalProps {
   isOpen: boolean
@@ -23,7 +24,8 @@ export function CartModal({
   onRemoveItem,
   onClearCart,
 }: CartModalProps) {
-  const { t } = useSettings()
+  const { t, language } = useSettings()
+  const { showSuccess, showError } = useToast()
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('Cash')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [confirmation, setConfirmation] = useState<OrderConfirmationResult | null>(null)
@@ -36,35 +38,19 @@ export function CartModal({
     setIsSubmitting(true)
     setError(null)
 
-    // Optimal provider calculation per challenge rules:
-    // Cash: PagaFacil ($15)
-    // Transfer: CazaPagos ($5 if <= 500, 2.5% if <= 1000, 2.0% if > 1000)
-    // Card: compare PagaFacil (1%) vs CazaPagos (0-1.5k: 2%, 1.5k-5k: 1.5%, >5k: 0.5%)
-    let provider = 'PagaFacil'
-    if (paymentMethod === 'Transfer') {
-      provider = 'CazaPagos'
-    } else if (paymentMethod === 'Card') {
-      const pagaFee = totalAmount * 0.01
-      let cazaFee = totalAmount * 0.02
-      if (totalAmount > 5000) cazaFee = totalAmount * 0.005
-      else if (totalAmount > 1500) cazaFee = totalAmount * 0.015
-
-      provider = cazaFee < pagaFee ? 'CazaPagos' : 'PagaFacil'
-    }
-
+    // 1. Confirm order payload with PaymentMode and selected Products
     const payload = {
-      provider,
-      method: paymentMethod,
-      products: items.flatMap((i) =>
+      PaymentMode: paymentMethod,
+      Products: items.flatMap((i) =>
         Array.from({ length: i.quantity }, () => ({
-          name: i.product.name,
-          unitPrice: i.product.unitPrice,
+          Name: i.product.name,
+          UnitPrice: i.product.unitPrice,
         }))
       ),
     }
 
     try {
-      const response = await fetch('/api/payments/initiate', {
+      const response = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -75,28 +61,45 @@ export function CartModal({
         throw new Error(errorText || `HTTP ${response.status}`)
       }
 
+      // 2. Order created response containing orderId, amount, fees, products, provider
       const result = await response.json()
-      const totalFee = (result.fees ?? []).reduce(
-        (sum: number, f: { amount: number }) => sum + f.amount,
+      const orderId = result.orderId ?? result.OrderId
+      const providerId = result.provider?.id ?? result.Provider?.Id ?? 'Provider'
+      const feesList = result.fees ?? result.Fees ?? []
+      const totalFee = feesList.reduce(
+        (sum: number, f: { amount?: number; Amount?: number }) => sum + (f.amount ?? f.Amount ?? 0),
         0
       )
 
+      showSuccess(
+        language === 'es'
+          ? `Orden #${orderId} creada exitosamente con ${providerId}.`
+          : `Order #${orderId} created successfully with ${providerId}.`,
+        language === 'es' ? 'Orden Creada' : 'Order Created'
+      )
+
       setConfirmation({
-        orderId: result.externalOrderId ?? `ORD-${Date.now()}`,
-        provider: result.provider ?? provider,
-        method: result.method ?? paymentMethod,
-        amount: result.amount ?? totalAmount,
+        orderId: `#${orderId}`,
+        provider: providerId,
+        method: result.paymentMode ?? result.PaymentMode ?? paymentMethod,
+        amount: result.amount ?? result.Amount ?? totalAmount,
         fee: totalFee,
-        status: result.status ?? 'Created',
+        status: result.status ?? result.Status ?? 'Created',
       })
 
       onClearCart()
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Error confirming payment order')
+      const msg = err instanceof Error ? err.message : 'Error confirming payment order'
+      setError(msg)
+      showError(
+        language === 'es' ? `Error al confirmar orden: ${msg}` : `Failed to confirm order: ${msg}`,
+        language === 'es' ? 'Error de Orden' : 'Order Failed'
+      )
     } finally {
       setIsSubmitting(false)
     }
   }
+
 
   const handleClose = () => {
     setConfirmation(null)

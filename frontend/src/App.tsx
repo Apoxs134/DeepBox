@@ -1,15 +1,45 @@
 import { useState } from 'react'
-import { useProducts, ProductList, ProductForm } from './features/products'
+import { useProducts, ProductList, ProductForm, type Product, type CreateProductDto } from './features/products'
 import { useCart, CartModal } from './features/cart'
 import { SettingsProvider, useSettings, SettingsModal } from './features/settings'
+import { ToastProvider, useToast } from './features/toast'
+import { OrderHistoryModal } from './features/orders'
 
 function AppContent() {
   const { products, loading, error, isSubmitting, reload, addProduct } = useProducts()
   const { items, totalCount, totalAmount, addToCart, removeFromCart, updateQuantity, clearCart } = useCart()
-  const { role, t } = useSettings()
+  const { role, language, t } = useSettings()
+  const { showSuccess, showError } = useToast()
 
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const [isOrderHistoryOpen, setIsOrderHistoryOpen] = useState(false)
+
+  const handleAddToCart = (product: Product) => {
+    addToCart(product)
+    showSuccess(
+      language === 'es' ? `"${product.name}" agregado al carrito` : `"${product.name}" added to cart`,
+      language === 'es' ? 'Carrito' : 'Cart'
+    )
+  }
+
+  const handleAddProduct = async (dto: CreateProductDto) => {
+    try {
+      const res = await addProduct(dto)
+      showSuccess(
+        language === 'es' ? `Producto "${dto.name}" creado con éxito` : `Product "${dto.name}" created successfully`,
+        language === 'es' ? 'Catálogo' : 'Catalog'
+      )
+      return res
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Error creating product'
+      showError(
+        language === 'es' ? `Error al crear producto: ${msg}` : `Failed to create product: ${msg}`,
+        language === 'es' ? 'Catálogo' : 'Catalog'
+      )
+      throw err
+    }
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
@@ -42,11 +72,11 @@ function AppContent() {
 
           {/* Right Actions: Cart (Left of Settings) + Gear (Settings at Top Right) */}
           <div className="flex items-center gap-3">
-            {/* 2. Buying cart at left of settings (Create order) */}
+            {/* 3. In Cart remove "Create Order" text: Only cart icon + badge counter (+ amount) */}
             <button
               type="button"
               onClick={() => setIsCartOpen(true)}
-              className="relative flex items-center gap-2.5 px-3.5 py-2 bg-slate-800/90 hover:bg-slate-700 text-white rounded-xl border border-slate-700 transition-all shadow-sm group hover:border-slate-600"
+              className="relative flex items-center gap-2 px-3 py-2 bg-slate-800/90 hover:bg-slate-700 text-white rounded-xl border border-slate-700 transition-all shadow-sm group hover:border-slate-600"
               aria-label={t('cartButton')}
             >
               <div className="relative">
@@ -60,11 +90,8 @@ function AppContent() {
                   </span>
                 )}
               </div>
-              <span className="text-xs font-semibold hidden sm:inline text-slate-200">
-                {t('cartButton')}
-              </span>
               {totalAmount > 0 && (
-                <span className="text-xs font-bold text-emerald-400 font-mono hidden md:inline ml-1 border-l border-slate-700 pl-2">
+                <span className="text-xs font-bold text-emerald-400 font-mono ml-0.5">
                   ${totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               )}
@@ -89,11 +116,11 @@ function AppContent() {
 
       {/* Main Content */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-8">
-        {/* 4. Role-based view: Hide new product for user, only admin can see it */}
+        {/* Role-based view: Hide new product for user, only admin can see it */}
         {role === 'Admin' ? (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-1">
-              <ProductForm onSubmit={addProduct} isSubmitting={isSubmitting} />
+              <ProductForm onSubmit={handleAddProduct} isSubmitting={isSubmitting} />
             </div>
             <div className="lg:col-span-2">
               <ProductList
@@ -101,7 +128,7 @@ function AppContent() {
                 loading={loading}
                 error={error}
                 onRefresh={reload}
-                onAddToCart={addToCart}
+                onAddToCart={handleAddToCart}
               />
             </div>
           </div>
@@ -112,7 +139,7 @@ function AppContent() {
               loading={loading}
               error={error}
               onRefresh={reload}
-              onAddToCart={addToCart}
+              onAddToCart={handleAddToCart}
             />
           </div>
         )}
@@ -133,6 +160,12 @@ function AppContent() {
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
+        onOpenOrderHistory={() => setIsOrderHistoryOpen(true)}
+      />
+
+      <OrderHistoryModal
+        isOpen={isOrderHistoryOpen}
+        onClose={() => setIsOrderHistoryOpen(false)}
       />
     </div>
   )
@@ -141,7 +174,9 @@ function AppContent() {
 export function App() {
   return (
     <SettingsProvider>
-      <AppContent />
+      <ToastProvider>
+        <AppContent />
+      </ToastProvider>
     </SettingsProvider>
   )
 }

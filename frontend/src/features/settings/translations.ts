@@ -4,7 +4,7 @@ export const translations = {
     appTitle: 'DeepBox',
     appSubtitle: 'Payment Orders & Catalog',
     backendStatus: 'Backend: SQLite Minimal API',
-    cartButton: 'Create Order',
+    cartButton: 'Cart',
     settings: 'Settings',
     role: 'Role',
     roleAdmin: 'Admin',
@@ -46,9 +46,9 @@ export const translations = {
     errCreateFailed: 'Failed to create product',
 
     // Cart & Order Modal
-    modalOrderTitle: 'Create Order',
+    modalOrderTitle: 'Shopping Order',
     modalTotalLabel: 'Total Amount',
-    emptyCart: 'Your cart is empty. Add products from the catalog to create an order.',
+    emptyCart: 'Your cart is empty. Add products from the catalog to confirm an order.',
     cartItemsCount: 'Selected Products',
     unitPrice: 'Unit Price',
     qty: 'Qty',
@@ -71,13 +71,15 @@ export const translations = {
     settingsTitle: 'Preferences & Settings',
     settingsDesc: 'Configure user role permissions and interface language.',
     adminNotice: 'Admin role allows adding new catalog products. User role hides the product creation form.',
+    ordersHistoryBtn: 'Orders History',
+    ordersHistoryDesc: 'View historical orders, provider details and cancellations',
   },
   es: {
     // Header & Navigation
     appTitle: 'DeepBox',
     appSubtitle: 'Órdenes de Pago y Catálogo',
     backendStatus: 'Backend: SQLite Minimal API',
-    cartButton: 'Crear orden',
+    cartButton: 'Carrito',
     settings: 'Configuración',
     role: 'Rol',
     roleAdmin: 'Administrador',
@@ -119,9 +121,9 @@ export const translations = {
     errCreateFailed: 'Error al crear el producto',
 
     // Cart & Order Modal
-    modalOrderTitle: 'Crear Orden',
+    modalOrderTitle: 'Orden de Compra',
     modalTotalLabel: 'Total',
-    emptyCart: 'Tu carrito está vacío. Agrega productos del catálogo para crear una orden.',
+    emptyCart: 'Tu carrito está vacío. Agrega productos del catálogo para confirmar una orden.',
     cartItemsCount: 'Productos Seleccionados',
     unitPrice: 'Precio Unitario',
     qty: 'Cant.',
@@ -144,6 +146,8 @@ export const translations = {
     settingsTitle: 'Preferencias y Configuración',
     settingsDesc: 'Configura los permisos de rol de usuario y el idioma de la interfaz.',
     adminNotice: 'El rol Administrador permite agregar productos al catálogo. El rol Usuario oculta la creación de productos.',
+    ordersHistoryBtn: 'Historial de Órdenes',
+    ordersHistoryDesc: 'Consulta órdenes anteriores, detalles de proveedores y cancelaciones',
   },
 } as const
 

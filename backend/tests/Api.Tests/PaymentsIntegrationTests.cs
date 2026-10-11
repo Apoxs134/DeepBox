@@ -98,7 +98,7 @@ public class PaymentsIntegrationTests : IClassFixture<WebApplicationFactory<Prog
         Assert.NotNull(result);
         Assert.Equal("PagaFacil", result.Provider);
         Assert.Equal("Cash", result.Method);
-        Assert.NotEqual(Guid.Empty, result.ExternalOrderId);
+        Assert.False(string.IsNullOrWhiteSpace(result.ExternalOrderId));
         Assert.NotEmpty(result.Fees);
     }
 

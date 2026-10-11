@@ -20,7 +20,7 @@ public sealed record PaymentFeeDto(
 );
 
 public sealed record PaymentResult(
-    Guid ExternalOrderId,
+    string ExternalOrderId,
     string Provider,
     string Method,
     decimal Amount,
@@ -54,7 +54,7 @@ public sealed record ThirdPartyProduct(
 );
 
 public sealed record ThirdPartyOrderResponse(
-    [property: JsonPropertyName("orderId")] Guid OrderId,
+    [property: JsonPropertyName("orderId")] string OrderId,
     [property: JsonPropertyName("amount")] double Amount,
     [property: JsonPropertyName("status")] string Status,
     [property: JsonPropertyName("method")] string Method,
@@ -66,5 +66,9 @@ public sealed record ThirdPartyOrderResponse(
 
 public sealed record ThirdPartyFee(
     [property: JsonPropertyName("name")] string? Name,
+    [property: JsonPropertyName("title")] string? Title,
     [property: JsonPropertyName("amount")] double Amount
-);
+)
+{
+    public string DisplayName => !string.IsNullOrWhiteSpace(Name) ? Name : (!string.IsNullOrWhiteSpace(Title) ? Title : "Fee");
+}
