@@ -1,0 +1,181 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/apoxsmac/Documents/Projects/DeepBox/backend/tests/Api.Tests/Api.Tests.csproj": {}
+  },
+  "projects": {
+    "/Users/apoxsmac/Documents/Projects/DeepBox/backend/src/Api/Api.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/apoxsmac/Documents/Projects/DeepBox/backend/src/Api/Api.csproj",
+        "projectName": "Api",
+        "projectPath": "/Users/apoxsmac/Documents/Projects/DeepBox/backend/src/Api/Api.csproj",
+        "packagesPath": "/Users/apoxsmac/.nuget/packages/",
+        "outputPath": "/Users/apoxsmac/Documents/Projects/DeepBox/backend/src/Api/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/apoxsmac/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net9.0"
+        ],
+        "sources": {
+          "/Users/apoxsmac/development/homebrew/Cellar/dotnet@9/9.0.121/libexec/library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net9.0": {
+            "targetAlias": "net9.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.100"
+      },
+      "frameworks": {
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "dependencies": {
+            "Microsoft.AspNetCore.OpenApi": {
+              "target": "Package",
+              "version": "[9.0.2, )"
+            },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[9.0.2, )"
+            },
+            "Microsoft.EntityFrameworkCore.Sqlite": {
+              "target": "Package",
+              "version": "[9.0.2, )"
+            },
+            "Swashbuckle.AspNetCore": {
+              "target": "Package",
+              "version": "[7.3.1, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/Users/apoxsmac/development/homebrew/Cellar/dotnet@9/9.0.121/libexec/sdk/9.0.121/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/apoxsmac/Documents/Projects/DeepBox/backend/tests/Api.Tests/Api.Tests.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/apoxsmac/Documents/Projects/DeepBox/backend/tests/Api.Tests/Api.Tests.csproj",
+        "projectName": "Api.Tests",
+        "projectPath": "/Users/apoxsmac/Documents/Projects/DeepBox/backend/tests/Api.Tests/Api.Tests.csproj",
+        "packagesPath": "/Users/apoxsmac/.nuget/packages/",
+        "outputPath": "/Users/apoxsmac/Documents/Projects/DeepBox/backend/tests/Api.Tests/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/apoxsmac/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net9.0"
+        ],
+        "sources": {
+          "/Users/apoxsmac/development/homebrew/Cellar/dotnet@9/9.0.121/libexec/library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net9.0": {
+            "targetAlias": "net9.0",
+            "projectReferences": {
+              "/Users/apoxsmac/Documents/Projects/DeepBox/backend/src/Api/Api.csproj": {
+                "projectPath": "/Users/apoxsmac/Documents/Projects/DeepBox/backend/src/Api/Api.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.100"
+      },
+      "frameworks": {
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "dependencies": {
+            "Microsoft.AspNetCore.Mvc.Testing": {
+              "target": "Package",
+              "version": "[9.0.2, )"
+            },
+            "Microsoft.EntityFrameworkCore.Sqlite": {
+              "target": "Package",
+              "version": "[9.0.2, )"
+            },
+            "Microsoft.NET.Test.Sdk": {
+              "target": "Package",
+              "version": "[17.12.0, )"
+            },
+            "coverlet.collector": {
+              "target": "Package",
+              "version": "[6.0.2, )"
+            },
+            "xunit": {
+              "target": "Package",
+              "version": "[2.9.2, )"
+            },
+            "xunit.runner.visualstudio": {
+              "target": "Package",
+              "version": "[2.8.2, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/Users/apoxsmac/development/homebrew/Cellar/dotnet@9/9.0.121/libexec/sdk/9.0.121/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

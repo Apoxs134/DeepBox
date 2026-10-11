@@ -1,0 +1,48 @@
+namespace Api.Data;
+
+using Api.Features.Items;
+using Microsoft.EntityFrameworkCore;
+
+public static class DbInitializer
+{
+    public static async Task InitializeAsync(AppDbContext context)
+    {
+        await context.Database.EnsureCreatedAsync();
+
+        if (!await context.Items.AnyAsync())
+        {
+            context.Items.AddRange(
+                new Item
+                {
+                    Name = "Dell Inspiron 5050",
+                    Details = "32Gb / 512 SSD / i7 2.2Ghz",
+                    UnitPrice = 2350.00m,
+                    IsAvailable = true
+                },
+                new Item
+                {
+                    Name = "Lenovo 3450",
+                    Details = "16Gb / 512 SSD / i5 1.6Ghz",
+                    UnitPrice = 2509.00m,
+                    IsAvailable = true
+                },
+                new Item
+                {
+                    Name = "Desk Flexible",
+                    Details = "4 Positions",
+                    UnitPrice = 3578.00m,
+                    IsAvailable = true
+                },
+                new Item
+                {
+                    Name = "Headset 450p",
+                    Details = "Logitech / Active Noise Can",
+                    UnitPrice = 459.00m,
+                    IsAvailable = false
+                }
+            );
+
+            await context.SaveChangesAsync();
+        }
+    }
+}
