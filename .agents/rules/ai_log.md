@@ -15,11 +15,12 @@ After completing any implementation or task, append an entry to `docs/AI_LOG.md`
 ## User Request
 [User Prompt]
 ## Agent Response
-[Agent summarized response]
+[Agent response]
+
 -------
 
 3. **Fields**:
    - `[Time Stamp]`: ISO 8601 timestamp (e.g., `[YYYY-MM-DDTHH:MM:SSZ]` or `[YYYY-MM-DDTHH:MM:SS±HH:MM]`).
    - `[User Prompt]`: The user's request.
-   - `[Agent summarized response]`: Summarized agent response describing what was completed.
+   - `[Agent response]`: Summarized agent response describing what was completed, written in normal text format (always leave a blank line before `-------` so markdown renders it as regular paragraph text, not a Setext heading).
    - `-------`: Divider between entries.

@@ -15,12 +15,13 @@ After completing any implementation or task, append an entry to `docs/AI_LOG.md`
 ## User Request
 [User Prompt]
 ## Agent Response
-[Agent summarized response]
+[Agent response]
+
 -------
 ```
 
 ### Fields
 - `[Time Stamp]`: Tagged with ISO timestamp (e.g. `[YYYY-MM-DDTHH:MM:SS±HH:MM]`).
 - `[User Prompt]`: The user's prompt/request.
-- `[Agent summarized response]`: Summarized agent response.
-- `-------`: Entry separator.
+- `[Agent response]`: Summarized agent response in normal text format (always include a blank line before `-------` to prevent markdown from rendering the body text as a Setext heading).
+- `-------`: Entry separator (horizontal rule).
