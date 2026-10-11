@@ -1,0 +1,41 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "🚀 Run App (Debug)",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "📱 Run iPhone (Debug)",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "00008120-000579DC34EA601E"
+        },
+        {
+            "name": "🚀 Run iPhone (Release)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release",
+            "deviceId": "00008120-000579DC34EA601E"
+        },
+        {
+            "name": "🍎 Run Simulator (Debug)",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "628D9025-5EB6-4334-B12E-02BE5EF4D6F9"
+        },
+        {
+            "name": "📦 Pub Get",
+            "request": "launch",
+            "type": "dart",
+            "toolArgs": ["pub", "get"]
+        },
+        {
+            "name": "🧹 Clean Project",
+            "request": "launch",
+            "type": "dart",
+            "toolArgs": ["clean"]
+        }
+    ]
+}

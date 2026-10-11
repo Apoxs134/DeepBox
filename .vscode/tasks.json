@@ -1,0 +1,55 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "🚀 Flutter: Command Center",
+            "type": "shell",
+            "command": "${input:flutterTask}",
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new",
+                "focus": true,
+                "close": false
+            }
+        }
+    ],
+    "inputs": [
+        {
+            "id": "flutterTask",
+            "type": "pickString",
+            "description": "Select a Flutter action:",
+            "options": [
+                {
+                    "label": "🚀 run_app.sh",
+                    "value": "./test/scripts/run_app.sh"
+                },
+                {
+                    "label": "🐛 debug_app.sh",
+                    "value": "./test/scripts/debug_app.sh"
+                },
+                {
+                    "label": "🎭 mock_app.sh",
+                    "value": "./test/scripts/mock_app.sh"
+                },
+                {
+                    "label": "📦 build_release.sh",
+                    "value": "./test/scripts/build_release.sh"
+                },
+                {
+                    "label": "📸 capture_store_screenshots.sh",
+                    "value": "./test/scripts/capture_store_screenshots.sh"
+                },
+                {
+                    "label": "🌱 seed_temporal_data.sh",
+                    "value": "./test/scripts/seed_temporal_data.sh"
+                },
+                {
+                    "label": "🧹 clear_temporal_data.sh",
+                    "value": "./test/scripts/clear_temporal_data.sh"
+                }
+            ],
+            "default": "./test/scripts/run_app.sh"
+        }
+    ]
+}

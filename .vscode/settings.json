@@ -1,0 +1,93 @@
+{
+    // --------------------------------------------------------
+    // 1. CRITICAL (Markdown Logic)
+    // --------------------------------------------------------
+    "workbench.editorAssociations": {
+        "*.md": "vscode.markdown.preview.editor"
+    },
+    "markdown.preview.scrollEditorWithPreview": true,
+    // --------------------------------------------------------
+    // 2. PRODUCTIVITY (Invisible Helpers)
+    // --------------------------------------------------------
+    "editor.formatOnSave": true,
+    "files.autoSave": "onFocusChange",
+    "files.trimTrailingWhitespace": true,
+    "explorer.compactFolders": false,
+    // --------------------------------------------------------
+    // 3. CLEANUP (Hide Junk Files)
+    // --------------------------------------------------------
+    "files.exclude": {
+        "**/.git": true,
+        "**/.DS_Store": true,
+        "**/__pycache__": true
+    },
+    // --------------------------------------------------------
+    // 4. TERMINAL PROFILES (CLI Toolchain Scripts)
+    // --------------------------------------------------------
+    "terminal.integrated.profiles.osx": {
+        "🚀 run_app.sh": {
+            "path": "bash",
+            "args": [
+                "-c",
+                "./test/scripts/run_app.sh"
+            ],
+            "icon": "play",
+            "color": "terminal.ansiGreen"
+        },
+        "🐛 debug_app.sh": {
+            "path": "bash",
+            "args": [
+                "-c",
+                "./test/scripts/debug_app.sh"
+            ],
+            "icon": "bug",
+            "color": "terminal.ansiCyan"
+        },
+        "🎭 mock_app.sh": {
+            "path": "bash",
+            "args": [
+                "-c",
+                "./test/scripts/mock_app.sh"
+            ],
+            "icon": "beaker",
+            "color": "terminal.ansiMagenta"
+        },
+        "📦 build_release.sh": {
+            "path": "bash",
+            "args": [
+                "-c",
+                "./test/scripts/build_release.sh"
+            ],
+            "icon": "package",
+            "color": "terminal.ansiYellow"
+        },
+        "📸 capture_store_screenshots.sh": {
+            "path": "bash",
+            "args": [
+                "-c",
+                "./test/scripts/capture_store_screenshots.sh"
+            ],
+            "icon": "device-camera",
+            "color": "terminal.ansiBlue"
+        },
+        "🌱 seed_temporal_data.sh": {
+            "path": "bash",
+            "args": [
+                "-c",
+                "./test/scripts/seed_temporal_data.sh"
+            ],
+            "icon": "database",
+            "color": "terminal.ansiGreen"
+        },
+        "🧹 clear_temporal_data.sh": {
+            "path": "bash",
+            "args": [
+                "-c",
+                "./test/scripts/clear_temporal_data.sh"
+            ],
+            "icon": "trash",
+            "color": "terminal.ansiRed"
+        }
+    },
+    "cmake.ignoreCMakeListsMissing": true
+}
