@@ -271,3 +271,35 @@ Implemented the complete end-to-end payment order management lifecycle adhering 
    - Added Vitest tests in `orders.test.tsx` verifying modal drilldown, back button navigation, cancellation flow, and toast rendering. All tests passing green.
 
 -------
+[2026-10-11T13:15:30-06:00]
+## User Request
+1.-add the orders history button just an icon btw cart and settings.
+2.-orders history : Failed to fetch orders.
+3.-in shoping order : next to payment method , put provider, and make sure the amount rules apply dynamically, and remove provider from buttons, rule in ref.
+
+## Agent Response
+Addressed all three user requests:
+
+1. **Header Order History Button**:
+   - Added an icon-only button (`<button ... aria-label="Orders History">`) located precisely between the Cart button and Settings gear button in `frontend/src/App.tsx`.
+   - Clicking the icon immediately opens the `OrderHistoryModal`.
+
+2. **Resolved "Failed to fetch orders"**:
+   - Identified that the previously running backend daemon was hosting an earlier build from before the `/api/orders` endpoints were added, returning a 404 response to Vite's proxy.
+   - Restarted `npm run dev` with `dotnet watch` to guarantee automatic hot reloading and synchronization across both Kestrel (`http://localhost:5000`) and Vite (`http://localhost:5173`).
+   - Verified live responses for `GET /api/orders`, `POST /api/orders`, and `PUT /api/orders/{id}/cancel` returning 200/201 OK.
+
+3. **Dynamic Provider Calculation in Shopping Order Modal**:
+   - In `frontend/src/features/cart/components/CartModal.tsx`, positioned the optimal Provider badge and estimated commission fee directly adjacent to the "Payment Method" header label.
+   - Implemented dynamic commission calculation mirroring the business reference rules:
+     - Cash: PagaFacil ($15 flat fee).
+     - Transfer: CazaPagos ($5 if <= $500; 2.5% if $500 - $1,000; 2.0% if > $1,000).
+     - Card: Compares PagaFacil (1% flat) vs CazaPagos (0-1500: 2%, 1500-5000: 1.5%, >5000: 0.5%), dynamically choosing the lowest fee provider based on the real-time cart total.
+   - Removed provider names from the 3 payment toggle buttons, displaying only the payment mode labels (`Pago en Efectivo`, `Pago en TDC`, `Transferencia`).
+
+4. **Testing and Verification**:
+   - All 8 .NET integration tests in `Api.Tests` passing.
+   - All 9 Vitest frontend tests passing.
+   - Full builds (`npm run build`) passing with zero errors.
+
+-------

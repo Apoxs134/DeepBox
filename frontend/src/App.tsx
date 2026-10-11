@@ -97,7 +97,20 @@ function AppContent() {
               )}
             </button>
 
-            {/* 1. Gear button (settings) at top right */}
+            {/* 1. Orders history button: just an icon between Cart and Settings */}
+            <button
+              type="button"
+              onClick={() => setIsOrderHistoryOpen(true)}
+              className="p-2.5 bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl border border-slate-700 transition-all shadow-sm hover:border-slate-600"
+              title={t('ordersHistoryBtn')}
+              aria-label={t('ordersHistoryBtn')}
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+            </button>
+
+            {/* 2. Gear button (settings) at top right */}
             <button
               type="button"
               onClick={() => setIsSettingsOpen(true)}

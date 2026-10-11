@@ -64,6 +64,8 @@ export const translations = {
     orderSuccessDesc: 'Your payment order has been successfully created and sent to the provider.',
     orderId: 'Order ID',
     providerAssigned: 'Assigned Provider',
+    providerLabel: 'Provider',
+    estFeeLabel: 'Est. Fee',
     feeAmount: 'Applied Fee',
     close: 'Close',
 
@@ -139,6 +141,8 @@ export const translations = {
     orderSuccessDesc: 'Tu orden de pago ha sido creada y enviada con éxito al proveedor.',
     orderId: 'ID de Orden',
     providerAssigned: 'Proveedor Asignado',
+    providerLabel: 'Proveedor',
+    estFeeLabel: 'Comisión est.',
     feeAmount: 'Comisión Aplicada',
     close: 'Cerrar',
 

@@ -107,6 +107,64 @@ export function CartModal({
     onClose()
   }
 
+  // Dynamic Optimal Provider and Fee calculation based on payment method and total amount
+  const getDynamicProviderInfo = () => {
+    if (paymentMethod === 'Cash') {
+      return {
+        provider: 'PagaFacil',
+        fee: 15.00,
+        ruleText: language === 'es' ? '15 pesos por transacción' : '$15 flat fee per transaction',
+      }
+    }
+
+    if (paymentMethod === 'Transfer') {
+      let fee = 5.00
+      let ruleText = language === 'es' ? '5 pesos (≤ $500)' : '$5 flat (≤ $500)'
+      if (totalAmount > 1000) {
+        fee = totalAmount * 0.02
+        ruleText = language === 'es' ? '2.0% (> $1,000)' : '2.0% (> $1,000)'
+      } else if (totalAmount > 500) {
+        fee = totalAmount * 0.025
+        ruleText = language === 'es' ? '2.5% ($500 - $1,000)' : '2.5% ($500 - $1,000)'
+      }
+      return {
+        provider: 'CazaPagos',
+        fee,
+        ruleText,
+      }
+    }
+
+    // Card mode: dynamic comparison
+    // PagaFacil: 1%
+    const pagaFee = totalAmount * 0.01
+    // CazaPagos: 0-1500 -> 2%, 1500-5000 -> 1.5%, >5000 -> 0.5%
+    let cazaFee = totalAmount * 0.02
+    let cazaRate = '2.0%'
+    if (totalAmount > 5000) {
+      cazaFee = totalAmount * 0.005
+      cazaRate = '0.5%'
+    } else if (totalAmount > 1500) {
+      cazaFee = totalAmount * 0.015
+      cazaRate = '1.5%'
+    }
+
+    if (cazaFee < pagaFee) {
+      return {
+        provider: 'CazaPagos',
+        fee: cazaFee,
+        ruleText: language === 'es' ? `CazaPagos ${cazaRate} (óptimo)` : `CazaPagos ${cazaRate} (optimal)`,
+      }
+    }
+
+    return {
+      provider: 'PagaFacil',
+      fee: pagaFee,
+      ruleText: language === 'es' ? 'PagaFacil 1.0% (óptimo)' : 'PagaFacil 1.0% (optimal)',
+    }
+  }
+
+  const optimal = getDynamicProviderInfo()
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
       {/* Modal with 90% height requirement */}
@@ -273,52 +331,70 @@ export function CartModal({
         <div className="px-6 py-4 border-t border-slate-800 bg-slate-950/95 backdrop-blur shrink-0 space-y-4 z-10">
           {!confirmation ? (
             <>
-              {/* Payment Type Toggle: 3 Options */}
+              {/* Payment Type Toggle: 3 Options with Provider next to label */}
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-2">
-                  {t('paymentMethodTitle')}
-                </label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-semibold text-slate-300">
+                    {t('paymentMethodTitle')}
+                  </label>
+                  {/* Next to payment method, put provider dynamically with amount rules */}
+                  <div className="flex items-center gap-1.5 bg-slate-900 border border-slate-800 px-2.5 py-1 rounded-lg">
+                    <span className="text-[11px] text-slate-400">
+                      {t('providerLabel')}:
+                    </span>
+                    <span className={`px-2 py-0.5 rounded text-xs font-bold ${
+                      optimal.provider === 'PagaFacil'
+                        ? 'bg-blue-950 text-blue-300 border border-blue-800'
+                        : 'bg-purple-950 text-purple-300 border border-purple-800'
+                    }`}>
+                      {optimal.provider}
+                    </span>
+                    <span className="text-amber-400 font-mono text-xs font-bold">
+                      (+${optimal.fee.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
+                    </span>
+                  </div>
+                </div>
+
+                {/* 3 Buttons with provider removed */}
                 <div className="grid grid-cols-3 gap-2 bg-slate-900 p-1.5 rounded-xl border border-slate-800">
                   <button
                     type="button"
                     onClick={() => setPaymentMethod('Cash')}
-                    className={`py-2 px-3 rounded-lg text-xs font-medium transition-all text-center flex flex-col items-center justify-center gap-1 ${
+                    className={`py-3 px-3 rounded-lg text-xs font-medium transition-all text-center flex items-center justify-center ${
                       paymentMethod === 'Cash'
                         ? 'bg-blue-600 text-white shadow-md'
                         : 'text-slate-400 hover:text-white hover:bg-slate-800'
                     }`}
                   >
                     <span className="font-semibold">{t('paymentCash')}</span>
-                    <span className="text-[10px] opacity-75">PagaFacil ($15)</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setPaymentMethod('Card')}
-                    className={`py-2 px-3 rounded-lg text-xs font-medium transition-all text-center flex flex-col items-center justify-center gap-1 ${
+                    className={`py-3 px-3 rounded-lg text-xs font-medium transition-all text-center flex items-center justify-center ${
                       paymentMethod === 'Card'
                         ? 'bg-blue-600 text-white shadow-md'
                         : 'text-slate-400 hover:text-white hover:bg-slate-800'
                     }`}
                   >
                     <span className="font-semibold">{t('paymentCard')}</span>
-                    <span className="text-[10px] opacity-75">Óptimo (1% - 0.5%)</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setPaymentMethod('Transfer')}
-                    className={`py-2 px-3 rounded-lg text-xs font-medium transition-all text-center flex flex-col items-center justify-center gap-1 ${
+                    className={`py-3 px-3 rounded-lg text-xs font-medium transition-all text-center flex items-center justify-center ${
                       paymentMethod === 'Transfer'
                         ? 'bg-blue-600 text-white shadow-md'
                         : 'text-slate-400 hover:text-white hover:bg-slate-800'
                     }`}
                   >
                     <span className="font-semibold">{t('paymentTransfer')}</span>
-                    <span className="text-[10px] opacity-75">CazaPagos ($5 - 2%)</span>
                   </button>
                 </div>
               </div>
+
 
               {/* Confirm Button below toggle */}
               <button
