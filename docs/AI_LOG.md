@@ -303,3 +303,19 @@ Addressed all three user requests:
    - Full builds (`npm run build`) passing with zero errors.
 
 -------
+[2026-10-11T13:19:15-06:00]
+## User Request
+OrderHistoryModal.tsx:74 Uncaught TypeError: Cannot read properties of undefined (reading 'toLowerCase')
+    at getStatusBadge (OrderHistoryModal.tsx:74:22)
+    at OrderHistoryModal.tsx:226:26
+    at Array.map (<anonymous>)
+    at OrderHistoryModal (OrderHistoryModal.tsx:207:25)
+
+## Agent Response
+Fixed the runtime TypeError in `OrderHistoryModal.tsx`:
+1. Updated `getStatusBadge` to safely accept optional status (`status?: string`) and fall back to `(status || '').toLowerCase()`, avoiding crashes on null or undefined status values.
+2. Updated `ordersApi.ts` with a `normalizeOrder` function ensuring all properties (`orderId`, `status`, `amount`, `fees`, `products`, `provider`, `paymentMode`, `createdAt`) are consistently mapped and populated regardless of backend property casing (PascalCase vs camelCase).
+3. Safely guarded `selectedOrder.status` in the cancellation zone condition with `(selectedOrder.status || '').toLowerCase()`.
+4. Verified with `npm run build` and all 17 integration and unit tests passing.
+
+-------
