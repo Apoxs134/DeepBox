@@ -479,3 +479,17 @@
 /Users/apoxsmac/Documents/Projects/DeepBox/backend/tests/Api.Tests/obj/Debug/net9.0/Api.Tests.pdb
 /Users/apoxsmac/Documents/Projects/DeepBox/backend/tests/Api.Tests/obj/Debug/net9.0/Api.Tests.genruntimeconfig.cache
 /Users/apoxsmac/Documents/Projects/DeepBox/backend/tests/Api.Tests/obj/Debug/net9.0/ref/Api.Tests.dll
+/Users/apoxsmac/Documents/Projects/DeepBox/backend/tests/Api.Tests/bin/Debug/net9.0/Microsoft.Extensions.AmbientMetadata.Application.dll
+/Users/apoxsmac/Documents/Projects/DeepBox/backend/tests/Api.Tests/bin/Debug/net9.0/Microsoft.Extensions.Compliance.Abstractions.dll
+/Users/apoxsmac/Documents/Projects/DeepBox/backend/tests/Api.Tests/bin/Debug/net9.0/Microsoft.Extensions.DependencyInjection.AutoActivation.dll
+/Users/apoxsmac/Documents/Projects/DeepBox/backend/tests/Api.Tests/bin/Debug/net9.0/Microsoft.Extensions.Diagnostics.ExceptionSummarization.dll
+/Users/apoxsmac/Documents/Projects/DeepBox/backend/tests/Api.Tests/bin/Debug/net9.0/Microsoft.Extensions.Http.dll
+/Users/apoxsmac/Documents/Projects/DeepBox/backend/tests/Api.Tests/bin/Debug/net9.0/Microsoft.Extensions.Http.Diagnostics.dll
+/Users/apoxsmac/Documents/Projects/DeepBox/backend/tests/Api.Tests/bin/Debug/net9.0/Microsoft.Extensions.Http.Resilience.dll
+/Users/apoxsmac/Documents/Projects/DeepBox/backend/tests/Api.Tests/bin/Debug/net9.0/Microsoft.Extensions.ObjectPool.dll
+/Users/apoxsmac/Documents/Projects/DeepBox/backend/tests/Api.Tests/bin/Debug/net9.0/Microsoft.Extensions.Resilience.dll
+/Users/apoxsmac/Documents/Projects/DeepBox/backend/tests/Api.Tests/bin/Debug/net9.0/Microsoft.Extensions.Telemetry.dll
+/Users/apoxsmac/Documents/Projects/DeepBox/backend/tests/Api.Tests/bin/Debug/net9.0/Microsoft.Extensions.Telemetry.Abstractions.dll
+/Users/apoxsmac/Documents/Projects/DeepBox/backend/tests/Api.Tests/bin/Debug/net9.0/Polly.Core.dll
+/Users/apoxsmac/Documents/Projects/DeepBox/backend/tests/Api.Tests/bin/Debug/net9.0/Polly.Extensions.dll
+/Users/apoxsmac/Documents/Projects/DeepBox/backend/tests/Api.Tests/bin/Debug/net9.0/Polly.RateLimiting.dll

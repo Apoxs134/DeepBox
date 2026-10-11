@@ -1,5 +1,6 @@
 using Api.Data;
-using Api.Features.Items;
+using Api.Features.Products;
+using Api.Features.Payments;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +11,9 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(connectionString));
+
+// Register typed HTTP clients for external payment gateways with resilience
+builder.Services.AddPaymentClients(builder.Configuration);
 
 // CORS for Vite dev server
 builder.Services.AddCors(options =>
@@ -38,7 +42,8 @@ if (app.Environment.IsDevelopment())
 app.UseCors("FrontendCors");
 
 // Map Minimal API slices
-app.MapItemsEndpoints();
+app.MapProductsEndpoints();
+app.MapPaymentsEndpoints();
 
 // Initialize DB and Seed data
 using (var scope = app.Services.CreateScope())

@@ -1,6 +1,6 @@
 namespace Api.Data;
 
-using Api.Features.Items;
+using Api.Features.Products;
 using Microsoft.EntityFrameworkCore;
 
 public static class DbInitializer
@@ -9,31 +9,31 @@ public static class DbInitializer
     {
         await context.Database.EnsureCreatedAsync();
 
-        if (!await context.Items.AnyAsync())
+        if (!await context.Products.AnyAsync())
         {
-            context.Items.AddRange(
-                new Item
+            context.Products.AddRange(
+                new Product
                 {
                     Name = "Dell Inspiron 5050",
                     Details = "32Gb / 512 SSD / i7 2.2Ghz",
                     UnitPrice = 2350.00m,
                     IsAvailable = true
                 },
-                new Item
+                new Product
                 {
                     Name = "Lenovo 3450",
                     Details = "16Gb / 512 SSD / i5 1.6Ghz",
                     UnitPrice = 2509.00m,
                     IsAvailable = true
                 },
-                new Item
+                new Product
                 {
                     Name = "Desk Flexible",
                     Details = "4 Positions",
                     UnitPrice = 3578.00m,
                     IsAvailable = true
                 },
-                new Item
+                new Product
                 {
                     Name = "Headset 450p",
                     Details = "Logitech / Active Noise Can",
