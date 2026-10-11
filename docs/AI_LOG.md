@@ -70,3 +70,21 @@ make a single command to run both backend and frontend from the root, npm run de
 Configured a root package.json using concurrently to orchestrate both the .NET backend API (http://localhost:5000) and the React Vite frontend (http://localhost:5173) simultaneously via 'npm run dev'. Configured launchSettings.json and Vite proxy, and validated that running 'npm run dev' from the workspace root launches both processes smoothly.
 
 -------
+[2026-10-11T17:19:00Z]
+## User Request
+Create an Antigravity skill named "backend-slice-skill" tailored for Vertical Slice Architecture.
+It must enforce colocation of endpoints, DTOs, validation, domain logic, and persistence per feature.
+Ensure strict boundaries: no cross-slice imports, no generic repository layers, duplication preferred over coupling, and clear input/output contract enforcement.
+## Agent Response
+Created the Antigravity skill 'backend-slice-skill' in .agents/skills/backend-slice-skill/SKILL.md. Configured guidelines and architectural rules enforcing Vertical Slice Architecture, including strict colocation of Minimal API endpoints, DTO contracts, validation, domain logic, and direct EF Core persistence per feature. Defined boundaries prohibiting cross-slice imports and generic repositories, favoring duplication over coupling, and specifying testing patterns.
+
+-------
+[2026-10-11T17:21:26Z]
+## User Request
+Create an Antigravity skill named "frontend-slice-skill" tailored for feature-sliced frontend architecture.
+It must enforce colocation of UI components, slice-specific state/hooks, queries/mutations, and DTO contracts inside a single feature folder.
+Ensure it forbids importing private state from sibling feature slices.
+## Agent Response
+Created the Antigravity skill 'frontend-slice-skill' in .agents/skills/frontend-slice-skill/SKILL.md. Enforced colocation of UI components, slice-specific state/hooks, API queries/mutations, and DTO contracts within feature folders (src/features/<feature>/). Mandated strict boundaries prohibiting the import of private internals or state from sibling feature slices, requiring explicit public API barrels (index.ts) for any exposed contracts. Updated the items feature slice to export through index.ts and verified builds and tests.
+
+-------

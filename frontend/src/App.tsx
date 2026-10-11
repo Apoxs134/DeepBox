@@ -1,6 +1,4 @@
-import { useItems } from './features/items/hooks/useItems'
-import { ItemList } from './features/items/components/ItemList'
-import { ItemForm } from './features/items/components/ItemForm'
+import { useItems, ItemList, ItemForm } from './features/items'
 
 export function App() {
   const { items, loading, error, isSubmitting, reload, addItem } = useItems()
