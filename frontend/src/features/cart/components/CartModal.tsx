@@ -12,6 +12,11 @@ interface CartModalProps {
   onUpdateQuantity: (productId: number, delta: number) => void
   onRemoveItem: (productId: number) => void
   onClearCart: () => void
+  providers?: Array<{
+    id: number
+    name: string
+    rules: Array<{ amount: number; condition: string; percentage: number; paymentMethod?: string }>
+  }>
 }
 
 export function CartModal({
@@ -23,6 +28,7 @@ export function CartModal({
   onUpdateQuantity,
   onRemoveItem,
   onClearCart,
+  providers,
 }: CartModalProps) {
   const { t, language } = useSettings()
   const { showSuccess, showError } = useToast()
@@ -107,8 +113,54 @@ export function CartModal({
     onClose()
   }
 
-  // Dynamic Optimal Provider and Fee calculation based on payment method and total amount
+  // 2.3: Dynamic optimal provider calculation: rule will only apply if is same payment method
   const getDynamicProviderInfo = () => {
+    // 1. If configured provider rules exist for this payment method, evaluate them dynamically!
+    if (providers && providers.length > 0) {
+      const candidates: Array<{ provider: string; fee: number; ruleText: string }> = []
+
+      for (const p of providers) {
+        const matchingRules = (p.rules || []).filter((r) => {
+          // Rule will only apply if is same payment method
+          const rMethod = (r.paymentMethod || 'card').toLowerCase()
+          if (rMethod !== paymentMethod.toLowerCase()) {
+            return false
+          }
+
+          const cond = (r.condition || '').toLowerCase()
+          if (cond === 'morethan' || cond === 'more than' || cond === '>') {
+            return totalAmount > r.amount
+          }
+          if (cond === 'equalandmorethan' || cond === 'equal and more than' || cond === '>=') {
+            return totalAmount >= r.amount
+          }
+          if (cond === 'lessthan' || cond === 'less than' || cond === '<') {
+            return totalAmount < r.amount
+          }
+          if (cond === 'equalandlessthan' || cond === 'equal and less than' || cond === '<=') {
+            return totalAmount <= r.amount
+          }
+          return totalAmount >= r.amount
+        })
+
+        if (matchingRules.length > 0) {
+          const best = [...matchingRules].sort((a, b) => a.percentage - b.percentage)[0]
+          const fee = (totalAmount * best.percentage) / 100
+          candidates.push({
+            provider: p.name,
+            fee,
+            ruleText: `${p.name} ${best.percentage}% (${language === 'es' ? 'óptimo' : 'optimal'})`,
+          })
+        }
+      }
+
+      if (candidates.length > 0) {
+        candidates.sort((a, b) => a.fee - b.fee)
+        return candidates[0]
+      }
+    }
+
+    // 2. Fallbacks by payment method when no custom rules match for that payment method
     if (paymentMethod === 'Cash') {
       return {
         provider: 'PagaFacil',
@@ -134,10 +186,8 @@ export function CartModal({
       }
     }
 
-    // Card mode: dynamic comparison
-    // PagaFacil: 1%
+    // Card fallback
     const pagaFee = totalAmount * 0.01
-    // CazaPagos: 0-1500 -> 2%, 1500-5000 -> 1.5%, >5000 -> 0.5%
     let cazaFee = totalAmount * 0.02
     let cazaRate = '2.0%'
     if (totalAmount > 5000) {
@@ -162,6 +212,8 @@ export function CartModal({
       ruleText: language === 'es' ? 'PagaFacil 1.0% (óptimo)' : 'PagaFacil 1.0% (optimal)',
     }
   }
+
+
 
   const optimal = getDynamicProviderInfo()
 

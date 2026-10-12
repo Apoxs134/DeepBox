@@ -76,3 +76,29 @@ export async function cancelOrder(id: number): Promise<Order> {
   const data = await res.json()
   return normalizeOrder(data)
 }
+
+export async function approveOrder(id: number): Promise<Order> {
+  const res = await fetch(`${BASE_URL}/${id}/approve`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+  })
+  if (!res.ok) {
+    const errorText = await res.text()
+    throw new Error(errorText || 'Failed to approve order')
+  }
+  const data = await res.json()
+  return normalizeOrder(data)
+}
+
+export async function rejectOrder(id: number): Promise<Order> {
+  const res = await fetch(`${BASE_URL}/${id}/reject`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+  })
+  if (!res.ok) {
+    const errorText = await res.text()
+    throw new Error(errorText || 'Failed to reject order')
+  }
+  const data = await res.json()
+  return normalizeOrder(data)
+}

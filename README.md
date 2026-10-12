@@ -147,25 +147,72 @@ Las pasarelas son APIs REST externas independientes accesibles mediante HTTP.
 
 ---
 
-## 9. Entregables de Uso de IA
+## 9. Documentación y Entregables del Proyecto
 
-Como parte del proceso de desarrollo, el repositorio incluye los siguientes artefactos documentados:
+El repositorio cuenta con documentación exhaustiva en el directorio `docs/`:
 
-| Entregable | Archivo / Ubicación | Descripción |
+| Documento | Enlace | Descripción |
 | :--- | :--- | :--- |
-| **Uso de IA** | `docs/AI_USAGE.md` | Herramientas y modelos usados, tareas asignadas, propuestas aceptadas o rechazadas. |
-| **Plan / Especificación** | `docs/plan.md` o `spec.md` | Plan de trabajo y diseño arquitectónico previo a la generación de código. |
-| **Skills e Instrucciones** | `AGENTS.md` / `.agents/rules/` | Reglas del agente, directrices de registro y convenciones. |
-| **Historial y Correcciones** | `docs/AI_LOG.md` / `corrections.md` | Registro de prompts, respuestas y correcciones aplicadas durante el desarrollo. |
-| **Decisiones de Arquitectura** | `docs/adr/` | ADRs breves sobre capas, estrategias de integración y patrones descartados. |
-| **Supuestos y Ambigüedades** | `docs/assumptions.md` | Definición de supuestos sobre tercer proveedor no documentado, monedas y fallback de pasarelas. |
+| **Arquitectura del Sistema** | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Estructura del proyecto, Vertical Slice Architecture, capas vs slices, ADRs, frameworks y librerías. |
+| **Plan y Especificación** | [docs/plan.md](docs/plan.md) | Plan de trabajo, roadmap de fases, estrategia de pruebas y verificación. |
+| **Supuestos del Sistema** | [docs/assumptions.md](docs/assumptions.md) | Supuestos de negocio y técnicos (roles, proveedores, gestión de reglas y pasarelas). |
+| **Uso de Herramientas IA** | [docs/AI_USAGE.md](docs/AI_USAGE.md) | Herramientas y modelos utilizados, prompts clave y decisiones asistidas por IA. |
+| **Bitácora de IA** | [docs/AI_LOG.md](docs/AI_LOG.md) | Registro de interacciones y prompts procesados. |
 
 ---
 
-## 10. Criterios de Evaluación
+## 10. Cómo Ejecutar el Proyecto (Quick Start)
 
-1. **Calidad del Código**: Claridad, legibilidad, nomenclatura, uso de principios SOLID y patrones de diseño.
-2. **Arquitectura**: Separación de capas, modularidad y desacoplamiento de pasarelas.
-3. **Funcionalidad**: Cumplimiento íntegro de los requerimientos RF-01 al RF-10 y cálculo exacto de comisiones.
-4. **Pruebas**: Cobertura adecuada de casos límite en comisiones y mocks para servicios externos.
-5. **Experiencia de Usuario**: Interfaz intuitiva, responsiva, con estados de carga y retroalimentación clara.
+### Requisitos Previos
+- **.NET 9 SDK** (`dotnet --version` >= 9.0)
+- **Node.js** (versión 20+ recomendada) y **npm**
+
+### Instalación de Dependencias
+```bash
+# Instalar dependencias raíz y de frontend
+npm install
+npm install --prefix frontend
+```
+
+### Ejecución en Desarrollo
+Para ejecutar tanto el backend C# (.NET 9) como el frontend (React + Vite) de manera concurrente:
+```bash
+npm run dev
+```
+- **Frontend**: [http://localhost:5173](http://localhost:5173)
+- **Backend API**: [http://localhost:5000](http://localhost:5000)
+- **Swagger UI**: [http://localhost:5000/swagger](http://localhost:5000/swagger)
+
+### Ejecutar Pruebas Automatizadas
+Ejecuta tanto la suite de integración de C# (.NET) como la suite de componentes de React (Vitest):
+```bash
+npm test
+```
+
+### Compilar Proyecto (Build de Producción)
+```bash
+npm run build
+```
+
+---
+
+## 11. Funcionalidades Destacadas en la Aplicación Web
+
+1. **Gestión de Roles (Admin / User)**:
+   - Configurable desde el modal de ajustes (⚙️).
+   - **Modo Usuario**: Catálogo con agregar al carrito, modal de carrito de compra (90% alto), selector de método de pago (*Efectivo*, *Tarjeta*, *Transferencia*), cálculo dinámico de proveedor óptimo y comisiones en tiempo real, confirmación de orden e historial de órdenes con cancelación.
+   - **Modo Administrador**: Acceso a la gestión de proveedores (🏛️) donde se pueden crear proveedores y configurar reglas dinámicas con toggle de método de pago (`TDC`, `Efectivo`, `Transferencia`). Gestión de órdenes con aprobación (`Approve`) y rechazo (`Reject`).
+2. **Soporte Bilingüe**:
+   - Alternancia entre Español e Inglés desde el modal de ajustes, con persistencia en `localStorage`.
+3. **Enrutamiento Inteligente de Pasarelas**:
+   - Evaluación en tiempo de ejecución de las reglas configuradas para el método de pago seleccionado, asignando automáticamente el proveedor con menor comisión o costo fijo.
+
+---
+
+## 12. Criterios de Evaluación
+
+1. **Calidad del Código**: Claridad, legibilidad, nomenclatura, uso de principios SOLID y Vertical Slice Architecture.
+2. **Arquitectura**: Desacoplamiento de pasarelas, colocalización de features y slices independientes.
+3. **Funcionalidad**: Cumplimiento íntegro de los requerimientos RF-01 al RF-10, reglas dinámicas de comisión y gestión de estados.
+4. **Pruebas**: Cobertura exhaustiva de endpoints e interfaces con pruebas automatizadas (.NET xUnit + Vitest).
+5. **Experiencia de Usuario**: Interfaz intuitiva, responsiva, moderna y con microinteracciones fluidas.

@@ -75,6 +75,8 @@ export const translations = {
     adminNotice: 'Admin role allows adding new catalog products. User role hides the product creation form.',
     ordersHistoryBtn: 'Orders History',
     ordersHistoryDesc: 'View historical orders, provider details and cancellations',
+    providersBtn: 'Payment Providers',
+    providersDesc: 'Manage payment providers and fee calculation rules',
   },
   es: {
     // Header & Navigation
@@ -152,6 +154,8 @@ export const translations = {
     adminNotice: 'El rol Administrador permite agregar productos al catálogo. El rol Usuario oculta la creación de productos.',
     ordersHistoryBtn: 'Historial de Órdenes',
     ordersHistoryDesc: 'Consulta órdenes anteriores, detalles de proveedores y cancelaciones',
+    providersBtn: 'Proveedores de Pago',
+    providersDesc: 'Gestiona pasarelas de pago y reglas de comisión',
   },
 } as const
 

@@ -22,7 +22,92 @@ public static class DbInitializer
                 ""CreatedAt"" TEXT NOT NULL,
                 ""UpdatedAt"" TEXT NULL
             );
+
+            CREATE TABLE IF NOT EXISTS ""Providers"" (
+                ""Id"" INTEGER NOT NULL CONSTRAINT ""PK_Providers"" PRIMARY KEY AUTOINCREMENT,
+                ""Name"" TEXT NOT NULL,
+                ""CreatedAt"" TEXT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS ""ProviderRules"" (
+                ""Id"" INTEGER NOT NULL CONSTRAINT ""PK_ProviderRules"" PRIMARY KEY AUTOINCREMENT,
+                ""ProviderId"" INTEGER NOT NULL CONSTRAINT ""FK_ProviderRules_Providers"" REFERENCES ""Providers"" (""Id"") ON DELETE CASCADE,
+                ""Amount"" TEXT NOT NULL,
+                ""Condition"" TEXT NOT NULL,
+                ""Percentage"" TEXT NOT NULL,
+                ""PaymentMethod"" TEXT NOT NULL DEFAULT 'Card',
+                ""CreatedAt"" TEXT NOT NULL
+            );
         ");
+
+        try
+        {
+            await context.Database.ExecuteSqlRawAsync(@"
+                ALTER TABLE ""ProviderRules"" ADD COLUMN ""PaymentMethod"" TEXT NOT NULL DEFAULT 'Card';
+            ");
+        }
+        catch
+        {
+            // Column already exists
+        }
+
+        if (!await context.Providers.AnyAsync())
+        {
+            var pagaFacil = new Api.Features.Providers.Provider
+            {
+                Name = "PagaFacil",
+                CreatedAt = DateTime.UtcNow,
+                Rules =
+                [
+                    new Api.Features.Providers.ProviderRule
+                    {
+                        Amount = 0m,
+                        Condition = "EqualAndMoreThan",
+                        Percentage = 1.0m,
+                        PaymentMethod = "Card",
+                        CreatedAt = DateTime.UtcNow
+                    }
+                ]
+            };
+
+            var cazaPagos = new Api.Features.Providers.Provider
+            {
+                Name = "CazaPagos",
+                CreatedAt = DateTime.UtcNow,
+                Rules =
+                [
+                    new Api.Features.Providers.ProviderRule
+                    {
+                        Amount = 1500m,
+                        Condition = "EqualAndLessThan",
+                        Percentage = 2.0m,
+                        PaymentMethod = "Card",
+                        CreatedAt = DateTime.UtcNow
+                    },
+                    new Api.Features.Providers.ProviderRule
+                    {
+                        Amount = 5000m,
+                        Condition = "EqualAndLessThan",
+                        Percentage = 1.5m,
+                        PaymentMethod = "Card",
+                        CreatedAt = DateTime.UtcNow
+                    },
+                    new Api.Features.Providers.ProviderRule
+                    {
+                        Amount = 5000m,
+                        Condition = "MoreThan",
+                        Percentage = 0.5m,
+                        PaymentMethod = "Card",
+                        CreatedAt = DateTime.UtcNow
+                    }
+                ]
+            };
+
+            context.Providers.AddRange(pagaFacil, cazaPagos);
+            await context.SaveChangesAsync();
+        }
+
+
 
         if (!await context.Products.AnyAsync())
         {

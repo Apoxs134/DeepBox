@@ -2,6 +2,7 @@ using Api.Data;
 using Api.Features.Products;
 using Api.Features.Payments;
 using Api.Features.Orders;
+using Api.Features.Providers;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -46,6 +47,8 @@ app.UseCors("FrontendCors");
 app.MapProductsEndpoints();
 app.MapPaymentsEndpoints();
 app.MapOrdersEndpoints();
+app.MapProvidersEndpoints();
+
 
 
 // Initialize DB and Seed data

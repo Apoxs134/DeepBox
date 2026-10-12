@@ -4,6 +4,7 @@ using System.Text.Json;
 using Api.Data;
 using Api.Features.Payments;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 
 public static class CreateOrder
 {
@@ -38,7 +39,7 @@ public static class CreateOrder
         }
 
         var totalAmount = request.Products.Sum(p => p.UnitPrice);
-        var optimalProvider = DetermineOptimalProvider(normalizedMode, totalAmount);
+        var optimalProvider = await DetermineOptimalProviderAsync(db, normalizedMode, totalAmount, ct);
 
         var thirdPartyProducts = request.Products
             .Select(p => new ThirdPartyProduct(p.Name, (double)p.UnitPrice))
@@ -115,6 +116,84 @@ public static class CreateOrder
         };
     }
 
+    public static async Task<string> DetermineOptimalProviderAsync(
+        AppDbContext db,
+        string normalizedMode,
+        decimal totalAmount,
+        CancellationToken ct = default)
+    {
+        if (normalizedMode == "Cash")
+        {
+            return "PagaFacil";
+        }
+
+        if (normalizedMode == "Transfer")
+        {
+            return "CazaPagos";
+        }
+
+        // Card mode: evaluate dynamic provider rules from database if configured
+        try
+        {
+            var providers = await db.Providers
+                .AsNoTracking()
+                .Include(p => p.Rules)
+                .ToListAsync(ct);
+
+            if (providers.Count > 0 && providers.Any(p => p.Rules.Count > 0))
+            {
+                var candidateFees = new List<(string Name, decimal Fee)>();
+
+                foreach (var provider in providers)
+                {
+                    decimal? calculatedFee = null;
+
+                    // Match all rules that satisfy condition and are for the same payment method
+                    var matchingRules = provider.Rules.Where(r =>
+                        string.Equals(r.PaymentMethod ?? "Card", normalizedMode, StringComparison.OrdinalIgnoreCase) &&
+                        (r.Condition switch
+                        {
+                            "MoreThan" => totalAmount > r.Amount,
+                            "EqualAndMoreThan" => totalAmount >= r.Amount,
+                            "LessThan" => totalAmount < r.Amount,
+                            "EqualAndLessThan" => totalAmount <= r.Amount,
+                            _ => totalAmount >= r.Amount
+                        })
+                    ).ToList();
+
+                    if (matchingRules.Count > 0)
+                    {
+                        // Calculate fee based on lowest percentage of matching rules
+                        var bestRule = matchingRules.OrderBy(r => r.Percentage).First();
+                        calculatedFee = (totalAmount * bestRule.Percentage) / 100m;
+                    }
+                    else if (normalizedMode == "Card" && provider.Name.Equals("PagaFacil", StringComparison.OrdinalIgnoreCase))
+                    {
+                        calculatedFee = totalAmount * 0.01m;
+                    }
+
+                    if (calculatedFee.HasValue)
+                    {
+                        candidateFees.Add((provider.Name, calculatedFee.Value));
+                    }
+                }
+
+                if (candidateFees.Count > 0)
+                {
+                    var winner = candidateFees.OrderBy(c => c.Fee).First();
+                    return winner.Name;
+                }
+            }
+        }
+        catch
+
+        {
+            // fallback
+        }
+
+        return DetermineOptimalProvider(normalizedMode, totalAmount);
+    }
+
     public static string DetermineOptimalProvider(string normalizedMode, decimal totalAmount)
     {
         if (normalizedMode == "Cash")
@@ -143,3 +222,4 @@ public static class CreateOrder
         return cazaPagosFee < pagaFacilFee ? "CazaPagos" : "PagaFacil";
     }
 }
+

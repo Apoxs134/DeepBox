@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { Order, CreateOrderPayload } from '../types'
-import { getOrders, getOrderById, createOrder, cancelOrder } from '../api/ordersApi'
+import { getOrders, getOrderById, createOrder, cancelOrder, approveOrder, rejectOrder } from '../api/ordersApi'
 
 export function useOrders(autoFetch = false) {
   const [orders, setOrders] = useState<Order[]>([])
@@ -62,6 +62,44 @@ export function useOrders(autoFetch = false) {
     }
   }, [selectedOrder])
 
+  const approveOrderAction = useCallback(async (orderId: number) => {
+    try {
+      setIsSubmitting(true)
+      setError(null)
+      const updated = await approveOrder(orderId)
+      setOrders((prev) => prev.map((o) => (o.orderId === orderId ? updated : o)))
+      if (selectedOrder && selectedOrder.orderId === orderId) {
+        setSelectedOrder(updated)
+      }
+      return updated
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Error approving order'
+      setError(msg)
+      throw err
+    } finally {
+      setIsSubmitting(false)
+    }
+  }, [selectedOrder])
+
+  const rejectOrderAction = useCallback(async (orderId: number) => {
+    try {
+      setIsSubmitting(true)
+      setError(null)
+      const updated = await rejectOrder(orderId)
+      setOrders((prev) => prev.map((o) => (o.orderId === orderId ? updated : o)))
+      if (selectedOrder && selectedOrder.orderId === orderId) {
+        setSelectedOrder(updated)
+      }
+      return updated
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Error rejecting order'
+      setError(msg)
+      throw err
+    } finally {
+      setIsSubmitting(false)
+    }
+  }, [selectedOrder])
+
   const createOrderAction = useCallback(async (payload: CreateOrderPayload) => {
     try {
       setIsSubmitting(true)
@@ -88,6 +126,9 @@ export function useOrders(autoFetch = false) {
     selectOrder,
     deselectOrder,
     cancelOrderAction,
+    approveOrderAction,
+    rejectOrderAction,
     createOrderAction,
   }
 }
+

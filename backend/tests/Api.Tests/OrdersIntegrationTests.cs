@@ -97,6 +97,35 @@ public class OrdersIntegrationTests : IClassFixture<WebApplicationFactory<Progra
         Assert.NotNull(orders);
     }
 
+    [Fact]
+    public async Task ApproveAndRejectOrder_UpdatesOrderStatusSuccessfully()
+    {
+        var client = _factory.CreateClient();
+
+        var payload = new CreateOrderRequest(
+            PaymentMode: "Card",
+            Products: new List<OrderProductItem> { new("Product Test", 500m) }
+        );
+
+        var createRes = await client.PostAsJsonAsync("/api/orders", payload);
+        var order = await createRes.Content.ReadFromJsonAsync<OrderDto>();
+        Assert.NotNull(order);
+
+        // Approve order
+        var approveRes = await client.PutAsync($"/api/orders/{order.OrderId}/approve", null);
+        Assert.Equal(HttpStatusCode.OK, approveRes.StatusCode);
+        var approved = await approveRes.Content.ReadFromJsonAsync<OrderDto>();
+        Assert.NotNull(approved);
+        Assert.Equal("Approved", approved.Status);
+
+        // Reject order
+        var rejectRes = await client.PutAsync($"/api/orders/{order.OrderId}/reject", null);
+        Assert.Equal(HttpStatusCode.OK, rejectRes.StatusCode);
+        var rejected = await rejectRes.Content.ReadFromJsonAsync<OrderDto>();
+        Assert.NotNull(rejected);
+        Assert.Equal("Rejected", rejected.Status);
+    }
+
     public void Dispose()
     {
         _sqliteConnection.Close();

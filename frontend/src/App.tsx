@@ -1,19 +1,35 @@
 import { useState } from 'react'
-import { useProducts, ProductList, ProductForm, type Product, type CreateProductDto } from './features/products'
+import { useProducts, ProductList, type Product } from './features/products'
 import { useCart, CartModal } from './features/cart'
 import { SettingsProvider, useSettings, SettingsModal } from './features/settings'
 import { ToastProvider, useToast } from './features/toast'
 import { OrderHistoryModal } from './features/orders'
+import { useProviders, ProvidersModal } from './features/providers'
 
 function AppContent() {
-  const { products, loading, error, isSubmitting, reload, addProduct } = useProducts()
+  const { products, loading, error, reload } = useProducts()
   const { items, totalCount, totalAmount, addToCart, removeFromCart, updateQuantity, clearCart } = useCart()
   const { role, language, t } = useSettings()
-  const { showSuccess, showError } = useToast()
+  const { showSuccess } = useToast()
+
+  const {
+    providers,
+    selectedProvider,
+    loading: providersLoading,
+    isSubmitting: isProvidersSubmitting,
+    fetchProviders,
+    selectProvider,
+    deselectProvider,
+    addProviderAction,
+    deleteProviderAction,
+    addRuleAction,
+    deleteRuleAction,
+  } = useProviders(true)
 
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [isOrderHistoryOpen, setIsOrderHistoryOpen] = useState(false)
+  const [isProvidersModalOpen, setIsProvidersModalOpen] = useState(false)
 
   const handleAddToCart = (product: Product) => {
     addToCart(product)
@@ -23,23 +39,6 @@ function AppContent() {
     )
   }
 
-  const handleAddProduct = async (dto: CreateProductDto) => {
-    try {
-      const res = await addProduct(dto)
-      showSuccess(
-        language === 'es' ? `Producto "${dto.name}" creado con éxito` : `Product "${dto.name}" created successfully`,
-        language === 'es' ? 'Catálogo' : 'Catalog'
-      )
-      return res
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Error creating product'
-      showError(
-        language === 'es' ? `Error al crear producto: ${msg}` : `Failed to create product: ${msg}`,
-        language === 'es' ? 'Catálogo' : 'Catalog'
-      )
-      throw err
-    }
-  }
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
@@ -70,9 +69,9 @@ function AppContent() {
             </div>
           </div>
 
-          {/* Right Actions: Cart (Left of Settings) + Gear (Settings at Top Right) */}
+          {/* Right Actions: Cart, Order History, Providers (Admin only, left of Settings), Settings */}
           <div className="flex items-center gap-3">
-            {/* 3. In Cart remove "Create Order" text: Only cart icon + badge counter (+ amount) */}
+            {/* Cart Button */}
             <button
               type="button"
               onClick={() => setIsCartOpen(true)}
@@ -97,7 +96,7 @@ function AppContent() {
               )}
             </button>
 
-            {/* 1. Orders history button: just an icon between Cart and Settings */}
+            {/* Orders history button */}
             <button
               type="button"
               onClick={() => setIsOrderHistoryOpen(true)}
@@ -110,7 +109,22 @@ function AppContent() {
               </svg>
             </button>
 
-            {/* 2. Gear button (settings) at top right */}
+            {/* 2. In admin role, button in left of settings with an icon for providers */}
+            {role === 'Admin' && (
+              <button
+                type="button"
+                onClick={() => setIsProvidersModalOpen(true)}
+                className="p-2.5 bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-amber-400 rounded-xl border border-slate-700 hover:border-amber-600/50 transition-all shadow-sm"
+                title={t('providersBtn')}
+                aria-label={t('providersBtn')}
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </button>
+            )}
+
+            {/* Gear button (settings) at top right */}
             <button
               type="button"
               onClick={() => setIsSettingsOpen(true)}
@@ -127,36 +141,19 @@ function AppContent() {
         </div>
       </header>
 
-      {/* Main Content */}
+      {/* Main Content: Add new product hidden for admin */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-8">
-        {/* Role-based view: Hide new product for user, only admin can see it */}
-        {role === 'Admin' ? (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-1">
-              <ProductForm onSubmit={handleAddProduct} isSubmitting={isSubmitting} />
-            </div>
-            <div className="lg:col-span-2">
-              <ProductList
-                products={products}
-                loading={loading}
-                error={error}
-                onRefresh={reload}
-                onAddToCart={handleAddToCart}
-              />
-            </div>
-          </div>
-        ) : (
-          <div className="max-w-5xl mx-auto">
-            <ProductList
-              products={products}
-              loading={loading}
-              error={error}
-              onRefresh={reload}
-              onAddToCart={handleAddToCart}
-            />
-          </div>
-        )}
+        <div className="max-w-5xl mx-auto">
+          <ProductList
+            products={products}
+            loading={loading}
+            error={error}
+            onRefresh={reload}
+            onAddToCart={handleAddToCart}
+          />
+        </div>
       </main>
+
 
       {/* Modals */}
       <CartModal
@@ -168,6 +165,7 @@ function AppContent() {
         onUpdateQuantity={updateQuantity}
         onRemoveItem={removeFromCart}
         onClearCart={clearCart}
+        providers={providers}
       />
 
       <SettingsModal
@@ -179,6 +177,22 @@ function AppContent() {
       <OrderHistoryModal
         isOpen={isOrderHistoryOpen}
         onClose={() => setIsOrderHistoryOpen(false)}
+      />
+
+      <ProvidersModal
+        isOpen={isProvidersModalOpen}
+        onClose={() => setIsProvidersModalOpen(false)}
+        providers={providers}
+        selectedProvider={selectedProvider}
+        loading={providersLoading}
+        isSubmitting={isProvidersSubmitting}
+        onFetchProviders={fetchProviders}
+        onSelectProvider={selectProvider}
+        onDeselectProvider={deselectProvider}
+        onAddProvider={addProviderAction}
+        onDeleteProvider={deleteProviderAction}
+        onAddRule={addRuleAction}
+        onDeleteRule={deleteRuleAction}
       />
     </div>
   )

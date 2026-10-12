@@ -9,7 +9,7 @@ interface OrderHistoryModalProps {
 }
 
 export function OrderHistoryModal({ isOpen, onClose }: OrderHistoryModalProps) {
-  const { t, language } = useSettings()
+  const { t, language, role } = useSettings()
   const { showSuccess, showError } = useToast()
   const {
     orders,
@@ -21,6 +21,8 @@ export function OrderHistoryModal({ isOpen, onClose }: OrderHistoryModalProps) {
     selectOrder,
     deselectOrder,
     cancelOrderAction,
+    approveOrderAction,
+    rejectOrderAction,
   } = useOrders(false)
 
   useEffect(() => {
@@ -54,6 +56,50 @@ export function OrderHistoryModal({ isOpen, onClose }: OrderHistoryModalProps) {
     }
   }
 
+  const handleApproveOrder = async (orderId?: number) => {
+    const id = orderId ?? selectedOrder?.orderId
+    if (!id) return
+    try {
+      await approveOrderAction(id)
+      showSuccess(
+        language === 'es'
+          ? `La orden #${id} fue aprobada exitosamente.`
+          : `Order #${id} was approved successfully.`,
+        language === 'es' ? 'Orden Aprobada' : 'Order Approved'
+      )
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Error approving order'
+      showError(
+        language === 'es'
+          ? `No se pudo aprobar la orden #${id}: ${msg}`
+          : `Failed to approve order #${id}: ${msg}`,
+        language === 'es' ? 'Error al Aprobar' : 'Approval Failed'
+      )
+    }
+  }
+
+  const handleRejectOrder = async (orderId?: number) => {
+    const id = orderId ?? selectedOrder?.orderId
+    if (!id) return
+    try {
+      await rejectOrderAction(id)
+      showSuccess(
+        language === 'es'
+          ? `La orden #${id} fue rechazada.`
+          : `Order #${id} was rejected.`,
+        language === 'es' ? 'Orden Rechazada' : 'Order Rejected'
+      )
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Error rejecting order'
+      showError(
+        language === 'es'
+          ? `No se pudo rechazar la orden #${id}: ${msg}`
+          : `Failed to reject order #${id}: ${msg}`,
+        language === 'es' ? 'Error al Rechazar' : 'Rejection Failed'
+      )
+    }
+  }
+
   const formatCurrency = (val: number) => {
     return `$${val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
   }
@@ -72,16 +118,36 @@ export function OrderHistoryModal({ isOpen, onClose }: OrderHistoryModalProps) {
 
   const getStatusBadge = (status?: string) => {
     const s = (status || '').toLowerCase()
+    if (s === 'approved' || s === 'aprobada') {
+      return (
+        <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-950/90 text-emerald-300 border border-emerald-700 flex items-center gap-1">
+          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+          </svg>
+          {language === 'es' ? 'Aprobada' : 'Approved'}
+        </span>
+      )
+    }
+    if (s === 'rejected' || s === 'rechazada') {
+      return (
+        <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-950/90 text-rose-300 border border-rose-700 flex items-center gap-1">
+          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+          {language === 'es' ? 'Rechazada' : 'Rejected'}
+        </span>
+      )
+    }
     if (s === 'cancelled' || s === 'cancelada') {
       return (
-        <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-950/80 text-rose-300 border border-rose-800">
+        <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-800 text-slate-400 border border-slate-700">
           {language === 'es' ? 'Cancelada' : 'Cancelled'}
         </span>
       )
     }
     if (s === 'paid' || s === 'pagada') {
       return (
-        <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-950/80 text-emerald-300 border border-emerald-800">
+        <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-teal-950/80 text-teal-300 border border-teal-800">
           {language === 'es' ? 'Pagada' : 'Paid'}
         </span>
       )
@@ -248,7 +314,34 @@ export function OrderHistoryModal({ isOpen, onClose }: OrderHistoryModalProps) {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-4 shrink-0">
+                    <div className="flex items-center gap-3 shrink-0">
+                      {role === 'Admin' && (ord.status || '').toLowerCase() !== 'cancelled' && (
+                        <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            type="button"
+                            title={language === 'es' ? 'Aprobar Orden' : 'Approve Order'}
+                            onClick={() => handleApproveOrder(ord.orderId)}
+                            disabled={isSubmitting || (ord.status || '').toLowerCase() === 'approved'}
+                            className="p-1.5 rounded-lg bg-emerald-950/80 hover:bg-emerald-600 text-emerald-300 hover:text-white border border-emerald-800 disabled:opacity-40 transition-colors"
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                            </svg>
+                          </button>
+                          <button
+                            type="button"
+                            title={language === 'es' ? 'Rechazar Orden' : 'Reject Order'}
+                            onClick={() => handleRejectOrder(ord.orderId)}
+                            disabled={isSubmitting || (ord.status || '').toLowerCase() === 'rejected'}
+                            className="p-1.5 rounded-lg bg-rose-950/80 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-800 disabled:opacity-40 transition-colors"
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                      )}
+
                       <div className="text-right">
                         <span className="text-base font-extrabold text-emerald-400 font-mono block">
                           {formatCurrency(ord.amount)}
@@ -367,8 +460,54 @@ export function OrderHistoryModal({ isOpen, onClose }: OrderHistoryModalProps) {
                 </div>
               </div>
 
-              {/* 4.3 Cancel order button action */}
-              <div className="pt-4 border-t border-slate-800">
+              {/* Action Section */}
+              <div className="pt-4 border-t border-slate-800 space-y-4">
+                {/* Admin Management Section */}
+                {role === 'Admin' && (
+                  (selectedOrder.status || '').toLowerCase() === 'cancelled' || (selectedOrder.status || '').toLowerCase() === 'cancelada' ? null : (
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-950/90 border border-slate-800 p-4 rounded-xl">
+                      <div className="text-left">
+                        <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wide">
+                          {language === 'es' ? 'Gestión de Administrador' : 'Admin Order Management'}
+                        </h4>
+                        <p className="text-xs text-slate-400 mt-0.5">
+                          {language === 'es'
+                            ? 'Aprobar o rechazar esta orden. El cambio se reflejará directamente en el estado del usuario.'
+                            : 'Approve or reject this order. Decision reflects immediately in the user order status.'}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-2 w-full sm:w-auto">
+                        <button
+                          type="button"
+                          disabled={isSubmitting || (selectedOrder.status || '').toLowerCase() === 'approved'}
+                          onClick={() => handleApproveOrder()}
+                          className="flex-1 sm:flex-none px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-800 disabled:text-slate-500 text-white font-bold rounded-xl text-xs transition-all shadow-lg shadow-emerald-950/50 flex items-center justify-center gap-1.5"
+                        >
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                          </svg>
+                          <span>{language === 'es' ? 'Aprobar' : 'Approve'}</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          disabled={isSubmitting || (selectedOrder.status || '').toLowerCase() === 'rejected'}
+                          onClick={() => handleRejectOrder()}
+                          className="flex-1 sm:flex-none px-4 py-2.5 bg-rose-600 hover:bg-rose-500 disabled:bg-slate-800 disabled:text-slate-500 text-white font-bold rounded-xl text-xs transition-all shadow-lg shadow-rose-950/50 flex items-center justify-center gap-1.5"
+                        >
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                          <span>{language === 'es' ? 'Rechazar' : 'Reject'}</span>
+                        </button>
+                      </div>
+                    </div>
+
+                  )
+                )}
+
+                {/* Cancellation Section */}
                 {(selectedOrder.status || '').toLowerCase() === 'cancelled' || (selectedOrder.status || '').toLowerCase() === 'cancelada' ? (
                   <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 text-slate-400 text-xs flex items-center gap-3">
                     <svg className="w-5 h-5 text-rose-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -416,10 +555,12 @@ export function OrderHistoryModal({ isOpen, onClose }: OrderHistoryModalProps) {
                   </div>
                 )}
               </div>
+
             </div>
           )}
         </div>
       </div>
     </div>
   )
+
 }

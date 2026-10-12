@@ -319,3 +319,72 @@ Fixed the runtime TypeError in `OrderHistoryModal.tsx`:
 4. Verified with `npm run build` and all 17 integration and unit tests passing.
 
 -------
+[2026-10-11T19:49:00-06:00]
+## User Request
+1.-in admin role, admin can see the orders and reject or approved , and that will reflect in the user order status.
+2.-in admin role, will be a button in left of settings, that button will have an icon for providers.
+2.1.-providers will show the providers list, when click in a provider will open a modal, modal will have:
+2.1.1.-title.
+2.1.1.-rules list with an add button, amount / condition/ porcentage, delete button. add button will open a dialog
+2.1.2.-rules dialog will have:
+2.1.2.1.-title.
+2.1.2.2.-an input ammount that will only accept currency. (default 0)
+2.1.2.3.-a drop down that will define more than , equal and more than, less than, equal and less than. (more than default)
+2.1.2.4.-a porcentage that will only accept decimal number.
+2.1.2.5.-a save button that will only be enable when amount and porcentage has valid values. (save will link the rule to the provider)
+2.2.-providers will have a + button to add a provider , when clic will show an input text for the name of the provider, and will link.
+2.3.-the shoppin card will take this rules to define the optimal provider.
+## Agent Response
+Implemented complete end-to-end admin order approval/rejection and providers rule management engine:
+1. Admin Order Approval & Rejection:
+   - Added backend endpoints `PUT /api/orders/{id}/approve` and `PUT /api/orders/{id}/reject`.
+   - Updated frontend `useOrders` hook and `OrderHistoryModal` with quick actions in order rows and full controls in the order details modal for admins.
+   - Status immediately reflects in local state and across users with updated status badges (Approved, Rejected, Created/Pending, Paid, Cancelled).
+2. Providers Management UI & Rules Engine:
+   - Added providers button directly to the left of Settings in the header when in Admin role (`role === 'Admin'`).
+   - Created Providers feature slice (`frontend/src/features/providers/`) with `ProvidersModal`, `ProviderDetailsModal`, and `RuleDialog`.
+   - `ProvidersModal` lists providers with a `+` button that displays an inline input to create and link a new provider.
+   - `ProviderDetailsModal` displays the provider title, a table with rules (Amount / Condition / Percentage) and delete buttons, plus an "+ Add Rule" button.
+   - `RuleDialog` strictly validates currency-only amount (default 0), condition dropdown (`more than` [default], `equal and more than`, `less than`, `equal and less than`), decimal-only percentage, and enables Save only when values are valid.
+3. Dynamic Shopping Cart Rule Evaluation:
+   - `CartModal` and backend `CreateOrder` dynamically evaluate configured provider rules against the cart total amount to identify the optimal provider and lowest fee.
+4. Validation:
+   - 11/11 backend .NET tests passing and 12/12 frontend Vitest tests passing. Production build succeeds with 0 errors and 0 warnings.
+
+-------
+[2026-10-11T19:52:30-06:00]
+## User Request
+dotnet watch ❌ [Api (net9.0)] Exited with error code 134
+## Agent Response
+Diagnosed and resolved the cause of exit code 134 (SIGABRT):
+- Root Cause: Port 5000 was already bound by an existing instance of the API process (`Address already in use` error on `http://127.0.0.1:5000`).
+- Fix: Terminated the conflicting background process that was holding port 5000. Verified port release and verified `dotnet run --project backend/src/Api` starts cleanly listening on `http://localhost:5000`.
+
+-------
+[2026-10-11T20:20:45-06:00]
+## User Request
+1.-hide for admin the add new product.
+2.-for rules, add a toggle for TDC and the other paymetods. rule will only apply if is same paymetod
+3.-create a document md for structure of the proyect and the vertical slice arquitecture and the use of layers. and arquitecture desitions, frame works and libraries.
+4.-in admin -> Admin order managment, Approve Order->Approve, Reject Order->Reject.
+5.-create a for plan an especification. docs/plan.md.
+6.-create docs/AI_USAGE.
+7.-create docs/assumptions -> 
+-user can buy several products.
+-admin can create providers.
+-admin can accept / reject and cancel orders.
+-admin can create rules.
+-theres 2 roles admin / user, for time login looks out of scope.
+8.-create any missing file of readme
+
+## Agent Response
+1. Hidden product creation form from the Admin interface in App.tsx.
+2. Added payment method toggle (TDC, Efectivo, Transferencia) to provider rules in both frontend dialogs/modals and backend persistence, ensuring rules are evaluated strictly against matching payment methods.
+3. Created docs/ARCHITECTURE.md detailing project structure, Vertical Slice Architecture, layer usage, ADRs, frameworks, and libraries.
+4. Updated Admin Order Management button labels to 'Approve' and 'Reject' (and 'Aprobar' / 'Rechazar' in Spanish).
+5. Created docs/plan.md outlining development phases, architecture planning, and verification strategies.
+6. Created docs/AI_USAGE.md documenting tools, models, prompts, and accepted/rejected AI suggestions.
+7. Created docs/assumptions.md capturing domain and scope assumptions (multiple product purchases, provider/rule creation, order approvals/rejections, and role switching without authentication).
+8. Updated README.md with Quick Start commands, documentation references, and architectural highlights.
+
+-------

@@ -11,6 +11,8 @@ public static class OrdersEndpoints
         GetOrders.MapEndpoint(group);
         GetOrderById.MapEndpoint(group);
         CancelOrder.MapEndpoint(group);
+        ApproveOrder.MapEndpoint(group);
+        RejectOrder.MapEndpoint(group);
 
         return app;
     }
